@@ -264,7 +264,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 #' @title Normalization for sparse, under-sampled count data.
 #'
 #' @description Obtain normalization factors for sparse, under-sampled count data that often arise with
-#' metagenomic count data.
+#' metagenomic surveys.
 #'
 #' @param mat count matrix; rows are features and columns are samples
 #' @param condition a vector with group information on the samples
@@ -304,7 +304,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 #' data(mouseData)
 #' cntsMatrix <- MRcounts(mouseData)
 #' group <- pData(mouseData)$diet
-
+#'
 #' #Running wrench with defaults
 #' W <- wrench( cntsMatrix, condition=group  )
 #' compositionalFactors <- W$ccf
