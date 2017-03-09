@@ -1,1 +1,1 @@
-R package source code for Wrench normalization. Average proportional reference, empirical Bayes, hurdle weights; and other goodies.
+R package source code for Wrench normalization.
