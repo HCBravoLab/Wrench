@@ -21,6 +21,11 @@ getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
 
   pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, c(1*(x==0)), family=binomial() ) )
   pi0 <- t(sapply( pi0.fit, function(x) x$fitted.values  ))
+
+  #tau <- colSums(mat)
+  #pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, cbind( tau-x, x ), family=binomial() ) )
+  #pi0 <- t(sapply( pi0.fit, function(x) exp(tau*log(x$fitted.values)) ) )
+
   if(thresh){
     pi0[pi0>1-thresh.val] <- 1-thresh.val
     pi0[pi0<thresh.val] <- thresh.val
@@ -261,10 +266,39 @@ getReference <- function( mat, ref.est="sw.means", ... ){
   qref
 }
 
+#' @export
+detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
+  logccf <- log(ccf)
+  logtau <- log(tau)
+  grp <- as.factor(grp)
+  df <- data.frame("logccf"=logccf, "grp"=grp, "logtau"=logtau)
+
+  for( g in levels(df$grp) ){ #fit lm and remove trend
+    g.indcs <- which(df$grp==g)
+    g.sub <- df[g.indcs, ]
+    g.fit <- lm( logccf ~ logtau, data=g.sub )
+    pred.values <- predict( g.fit )
+    if(plt.detrends.all){
+      plot( g.sub$logccf ~ g.sub$logtau, col = "black" )
+      points( pred.values ~ g.sub$logtau, col = "red", pch=19 )
+    }
+
+    max.tau.indx <- which.max( g.sub$logtau )
+    g.sub$logccf <- g.sub$logccf + ( pred.values[max.tau.indx] - pred.values )
+    df$logccf[g.indcs] <- g.sub$logccf
+  }
+
+  ccfs.detr <- exp(df$logccf)
+  res <- list()
+  res$ccf.detr.un <- ccfs.detr
+  res$ccf.detr <- ccfs.detr / exp( mean(log(ccfs.detr)) )
+  res
+}
+
 #' @title Normalization for sparse, under-sampled count data.
 #'
 #' @description Obtain normalization factors for sparse, under-sampled count data that often arise with
-#' metagenomic surveys.
+#' metagenomic count data.
 #'
 #' @param mat count matrix; rows are features and columns are samples
 #' @param condition a vector with group information on the samples
@@ -304,7 +338,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 #' data(mouseData)
 #' cntsMatrix <- MRcounts(mouseData)
 #' group <- pData(mouseData)$diet
-#'
+
 #' #Running wrench with defaults
 #' W <- wrench( cntsMatrix, condition=group  )
 #' compositionalFactors <- W$ccf
@@ -337,7 +371,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 #' @author M. Senthil Kumar
 #' @export
 wrench <- function( mat, condition, etype="w.marg.mean",
-                    ebcf=T, z.adj=F, phi.adj=T, ... ){
+                    ebcf=T, z.adj=F, phi.adj=T, detrend=F, ... ){
 
   require(matrixStats)
 
@@ -400,7 +434,7 @@ wrench <- function( mat, condition, etype="w.marg.mean",
     p <- nrow(r)
     thetagi <- t( sapply(seq(p), function(i){
       exp(
-        (s2thetag/(s2[i]+s2thetag))*( log(r[i,]) - log(thetagj) )
+        (s2thetag_rep/(s2[i]+s2thetag_rep))*( log(r[i,]) - log(thetagj) )
       )
     }) )
 
@@ -443,6 +477,14 @@ wrench <- function( mat, condition, etype="w.marg.mean",
 
   res$ccf <- estimSummary( res, estim.type = etype, z.adj=z.adj, ... )
   res$ccf <- with(res, ccf/exp(mean(log(ccf))))
+
+  if( detrend ){
+    res$others$ccf0 <- res$ccf
+    detrended <- detrend.ccf( res$ccf, tots, condition )
+    res$others$ccf.detr.un <- detrended$ccf.detr.un
+    res$ccf <- detrended$ccf.detr
+  }
+
   tjs <- colSums(mat)/exp(mean(log(colSums(mat))))
   res$nf <- res$ccf * tjs
 
