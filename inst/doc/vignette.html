@@ -142,10 +142,8 @@ counts &lt;- MRcounts( mouseData, norm=F )
 group &lt;- pData(mouseData)$diet
 
 #Running wrench with defaults
-W &lt;- wrench( counts, condition=group  )</code></pre>
-<pre><code>## Loading required package: locfit</code></pre>
-<pre><code>## locfit 1.5-9.1    2013-03-22</code></pre>
-<pre class="r"><code>compositionalFactors &lt;- W$ccf
+W &lt;- wrench( counts, condition=group  )
+compositionalFactors &lt;- W$ccf
 normalizationFactors &lt;- W$nf</code></pre>
 </div>
 <div id="for-most-commonly-used-differential-abundance-pipelines" class="section level2">
@@ -176,11 +174,11 @@ deseq.obj &lt;- DESeqDataSetFromMatrix(countData = counts,
 time.levs &lt;- cut( time, breaks = c(0, 6, 28, 42, 56, 70) )
 overall_group &lt;- paste( group, time.levs ) #merge the time information and the group information together
 W &lt;- wrench( counts, condition = overall_group )</code></pre>
-</div>
-<div id="the-detrend-option" class="section level2">
-<h2>The “detrend” option</h2>
+<div id="the-detrend-option" class="section level4">
+<h4>The “detrend” option</h4>
 <p>In cases of very low sample depths and high sparsity, one might find a roughly linear trend between the reconstructed compositional factors (“ccf” entry in the returned list object from Wrench) and the sample depths within each experimental group. This can potentially be caused by a large number of zeros affecting the average estimate of the sample-wise ratios of proportions in a downward direction. Existing approaches that exploit zeroes during estimation also suffer from this issue (for instance, varying Scran’s abundance filtering by changing the “min.mean” parameter will reveal the same issue, although in general we have found their pooling approach to be slightly less sensitive with their default abundance filtering).</p>
-<p>If you find this happening with the Wrench reconstructed compositional factors, and if you can assume it is reasonable to do so, you can use the detrend=T option in Wrench to remove such linear trends within groups. It is also worth mentioning that even though low sample-depth samples’ compositional factors can show this behavior, in our experience, we have often found that group-wise averages of compositional factors can still be robust.</p>
+<p>If you find this happening with the Wrench reconstructed compositional factors, and if you can assume it is reasonable to do so, you can use the detrend=T option (a work in progress) in Wrench to remove such linear trends within groups. It is also worth mentioning that even though low sample-depth samples’ compositional factors can show this behavior, in our experience, we have often found that group-wise averages of compositional factors can still be robust.</p>
+</div>
 </div>
 
 

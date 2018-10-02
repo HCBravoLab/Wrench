@@ -77,8 +77,8 @@ overall_group <- paste( group, time.levs ) #merge the time information and the g
 W <- wrench( counts, condition = overall_group )
 ```
 
-## The "detrend" option
+#### The "detrend" option
 In cases of very low sample depths and high sparsity, one might find a roughly linear trend between the reconstructed compositional factors ("ccf" entry in the returned list object from Wrench) and the sample depths within each experimental group. This can potentially be caused by a large number of zeros affecting the average estimate of the sample-wise ratios of proportions in a downward direction. Existing approaches that exploit zeroes during estimation also suffer from this issue (for instance, varying Scran's abundance filtering by changing the "min.mean" parameter will reveal the same issue, although in general we have found their pooling approach to be slightly less sensitive with their default abundance filtering). 
 
-If you find this happening with the Wrench reconstructed compositional factors, and if you can assume it is reasonable to do so, you can use the detrend=T option in Wrench to remove such linear trends within groups. It is also worth mentioning that even though low sample-depth samples' compositional factors can show this behavior, in our experience, we have often found that group-wise averages of compositional factors can still be robust. 
+If you find this happening with the Wrench reconstructed compositional factors, and if you can assume it is reasonable to do so, you can use the detrend=T option (a work in progress) in Wrench to remove such linear trends within groups. It is also worth mentioning that even though low sample-depth samples' compositional factors can show this behavior, in our experience, we have often found that group-wise averages of compositional factors can still be robust. 
 
