@@ -12,4 +12,3 @@ getCondLogWeights(res)
 \description{
 Log Postive-conditional weight computations for wrench estimators.
 }
-

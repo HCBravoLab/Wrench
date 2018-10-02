@@ -12,4 +12,3 @@ getCondWeights(res)
 \description{
 Postive-conditional weight computations for wrench estimators.
 }
-

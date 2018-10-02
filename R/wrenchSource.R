@@ -14,7 +14,6 @@
 #'          \item{pi0 - matrix with fitted probabilities}
 #'          }
 #'
-#' @export
 getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
                       thresh=F, thresh.val=1e-8, ... ){
   require(matrixStats)
@@ -42,7 +41,6 @@ getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
 #'@param smoothed TRUE if all the variance estimates must be based on the mean-variance trend function.
 #'@return a vector with variance estimates for logged feature-wise counts.
 #'
-#'@export
 gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=F, ...){
 
   require(matrixStats)
@@ -90,7 +88,6 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=
 #' Marginal weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
 #' @param z.adj TRUE if the result structure was generated with \code{wrench} with \code{z.adj} set to TRUE.
-#' @export
 getMargWeights <- function( res, z.adj, ...  ){
   with(res$others, {
     s2theta <- design %*% s2thetag
@@ -108,7 +105,6 @@ getMargWeights <- function( res, z.adj, ...  ){
 
 #' Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
-#' @export
 getCondWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
@@ -118,7 +114,6 @@ getCondWeights <- function( res ) {
 
 #' Log Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
-#' @export
 getCondLogWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
@@ -148,7 +143,6 @@ getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
 #' Obtain robust means. .
 #' @param res result structure of \code{wrench}
 #' @param estim.type estimator type
-#' @export
 estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   require(matrixStats)
 
@@ -247,7 +241,7 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   }
 }
 
-#' @export
+#'
 getReference <- function( mat, ref.est="sw.means", ... ){
   require(matrixStats)
   tots <- colSums(mat)
@@ -266,7 +260,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
   qref
 }
 
-#' @export
+#'
 detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
   logccf <- log(ccf)
   logtau <- log(tau)
@@ -315,6 +309,8 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #'              by hurdle probabilities (arises when taking marginal expectation). Default recommended.
 #' @param phi.adj TRUE if estimates need to be adjusted for variance terms
 #'                (arises when considering positive-part expectations). Default recommended.
+#' @param detrend FALSE if any linear dependence between sample-depth and compositional factors needs to be removed.
+#'                (setting this to TRUE reduces variation in compositional factors and can improve accuracy, but requires an extra assumption that no linear dependence between compositional factors and sample depth is present in samples).
 #' @return a \code{list} with components:
 #'         \itemize{
 #'         \item{ \code{nf}, \emph{normalization factors} for samples passed.
@@ -358,14 +354,14 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #' #If using DESeq/DESeq2
 #'require(DESeq2)
 #'deseq.obj <- DESeqDataSetFromMatrix(countData = cntsMatrix,
-#'                                    colData = group,
-#'                                    design=as.formula(paste("~",diet))
-#')
-#'sizeFactors( deseq.obj  ) <- normFactors
-#'
+#'                                    DataFrame(group),
+#'                                    ~ group )
+#'DESeq2::sizeFactors(deseq.obj) <- normalizationFactors
+
+
 #' #If using metagenomeSeq
 #' normalizedObject <- mouseData
-#' pData(normalizedObject@expSummary$expSummary)$normFactors <- normFactors
+#' pData(normalizedObject@expSummary$expSummary)$normFactors <- normalizationFactors
 #'
 
 #' @author M. Senthil Kumar
