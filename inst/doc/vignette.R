@@ -23,6 +23,10 @@ normalizationFactors <- W$nf
 #Introducing the above normalization factors for the most
 # commonly used tools is shown below.
 
+# -- If using metagenomeSeq
+normalizedObject <- mouseData
+normFactors(normalizedObject) <- normalizationFactors
+
 # -- If using edgeR, we must pass in the compositional factors
 edgerobj <- DGEList( counts=counts,
                      group = as.matrix(group),
@@ -32,11 +36,8 @@ edgerobj <- DGEList( counts=counts,
 deseq.obj <- DESeqDataSetFromMatrix(countData = counts,
                                    DataFrame(group),
                                    ~ group )
-DESeq2::sizeFactors(deseq.obj) <- normalizationFactors
+sizeFactors(deseq.obj) <- normalizationFactors
 
-# -- If using metagenomeSeq
-normalizedObject <- mouseData
-pData(normalizedObject@expSummary$expSummary)$normFactors <- normalizationFactors
 
 ## ---- warning=FALSE------------------------------------------------------
 time <- as.numeric(as.character(pData(mouseData)$relativeTime))

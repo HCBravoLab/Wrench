@@ -125,31 +125,37 @@ $(document).ready(function () {
 </div>
 
 
-<p> is a normalization technique for metagenomic count data. While principally developed for sparse 16S count data from metagenomic experiments, it can also be applied to normalizing count data from other sparse technologies like single cell RNAseq, functional microbiome etc.,.</p>
+<p><em>Wrench</em> is a normalization technique for metagenomic count data. While principally developed for sparse 16S count data from metagenomic experiments, it can also be applied to normalizing count data from other sparse technologies like single cell RNAseq, functional microbiome etc.,.</p>
 <p>Given (a) count data organized as features (OTUs, genes etc.,) x samples, and (b) experimental group labels associated with samples, Wrench outputs a normalization factor for each sample. The data is normalized by dividing each sample’s counts with its normalization factor.</p>
 <p>The manuscript can be accessed here: [REF]</p>
 <div id="quick-short-storybackground" class="section level2">
 <h2>Quick short story/background</h2>
-<p>An unwanted side-effect of DNA sequencing is that the observed counts retain only relative expression/abundance information. Comparing such relative abundances between experimental conditions/groups (for e.g., with differential abundance analysis) can lead to incorrect inferences . Specifically, features that are truly not perturbed in their absolute abundances can be identified as being differentially abundant. Commonly used techniques like rarefaction/subsampling/dividing by the total count and other variants of these approaches, do not correct for this issue. Wrench was developed to address this problem of reconstructing absolute from relative abundances based on some commonly exploited assumptions in genomics.</p>
+<p>An unwanted side-effect of DNA sequencing is that the observed counts retain only relative abundance/expression information. Comparing such relative abundances between experimental conditions/groups (for e.g., with differential abundance analysis) can cause problems. Specifically, in the presence of features that are differentially abundant in absolute abundances, truly unperturbed features can be identified as being differentially abundant. Commonly used techniques like rarefaction/subsampling/dividing by the total count and other variants of these approaches, do not correct for this issue. Wrench was developed to address this problem of reconstructing absolute from relative abundances based on some commonly exploited assumptions in genomics.</p>
 <p>The manuscript presented here: goes into other details. Fig. 1 and table 1 presented in the manuscript provide some perspective on various commonly used normalization techniques from the above standpoint, and we recommend reading through them.</p>
 </div>
 <div id="running-wrench" class="section level2">
 <h2>Running Wrench</h2>
-<p>We pass count data, and group information and below, we present a quick tutorial. Details on any optional parameters are provided by typing “?wrench” in the R terminal window.</p>
+<p>Below, we present a quick tutorial, where we pass count data, and group information. Details on any optional parameters are provided by typing “?wrench” in the R terminal window.</p>
 <pre class="r"><code>#extract count and group information for from the mouse microbiome data in the metagenomeSeq package
 data(mouseData)
 counts &lt;- MRcounts( mouseData, norm=F ) 
 group &lt;- pData(mouseData)$diet
 
 #Running wrench with defaults
-W &lt;- wrench( counts, condition=group  )
-compositionalFactors &lt;- W$ccf
+W &lt;- wrench( counts, condition=group  )</code></pre>
+<pre><code>## Loading required package: locfit</code></pre>
+<pre><code>## locfit 1.5-9.1    2013-03-22</code></pre>
+<pre class="r"><code>compositionalFactors &lt;- W$ccf
 normalizationFactors &lt;- W$nf</code></pre>
 </div>
 <div id="for-most-commonly-used-differential-abundance-pipelines" class="section level2">
 <h2>For most commonly used differential abundance pipelines</h2>
 <pre class="r"><code>#Introducing the above normalization factors for the most
 # commonly used tools is shown below.
+
+# -- If using metagenomeSeq
+normalizedObject &lt;- mouseData
+normFactors(normalizedObject) &lt;- normalizationFactors
 
 # -- If using edgeR, we must pass in the compositional factors
 edgerobj &lt;- DGEList( counts=counts,
@@ -161,11 +167,7 @@ deseq.obj &lt;- DESeqDataSetFromMatrix(countData = counts,
                                    DataFrame(group),
                                    ~ group )</code></pre>
 <pre><code>## converting counts to integer mode</code></pre>
-<pre class="r"><code>DESeq2::sizeFactors(deseq.obj) &lt;- normalizationFactors
-
-# -- If using metagenomeSeq
-normalizedObject &lt;- mouseData
-pData(normalizedObject@expSummary$expSummary)$normFactors &lt;- normalizationFactors</code></pre>
+<pre class="r"><code>sizeFactors(deseq.obj) &lt;- normalizationFactors</code></pre>
 </div>
 <div id="some-caveats-work-in-development" class="section level2">
 <h2>Some caveats / work in development</h2>
@@ -174,6 +176,11 @@ pData(normalizedObject@expSummary$expSummary)$normFactors &lt;- normalizationFac
 time.levs &lt;- cut( time, breaks = c(0, 6, 28, 42, 56, 70) )
 overall_group &lt;- paste( group, time.levs ) #merge the time information and the group information together
 W &lt;- wrench( counts, condition = overall_group )</code></pre>
+</div>
+<div id="the-detrend-option" class="section level2">
+<h2>The “detrend” option</h2>
+<p>In cases of very low sample depths and high sparsity, one might find a roughly linear trend between the reconstructed compositional factors (“ccf” entry in the returned list object from Wrench) and the sample depths within each experimental group. This can potentially be caused by a large number of zeros affecting the average estimate of the sample-wise ratios of proportions in a downward direction. Existing approaches that exploit zeroes during estimation also suffer from this issue (for instance, varying Scran’s abundance filtering by changing the “min.mean” parameter will reveal the same issue, although in general we have found their pooling approach to be slightly less sensitive with their default abundance filtering).</p>
+<p>If you find this happening with the Wrench reconstructed compositional factors, and if you can assume it is reasonable to do so, you can use the detrend=T option in Wrench to remove such linear trends within groups. It is also worth mentioning that even though low sample-depth samples’ compositional factors can show this behavior, in our experience, we have often found that group-wise averages of compositional factors can still be robust.</p>
 </div>
 
 
