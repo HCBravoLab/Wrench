@@ -4,8 +4,8 @@
 \alias{wrench}
 \title{Normalization for sparse, under-sampled count data.}
 \usage{
-wrench(mat, condition, etype = "w.marg.mean", ebcf = T, z.adj = F,
-  phi.adj = T, detrend = F, ...)
+wrench(mat, condition, etype = "w.marg.mean", ebcf = TRUE,
+  z.adj = FALSE, phi.adj = TRUE, detrend = FALSE, ...)
 }
 \arguments{
 \item{mat}{count matrix; rows are features and columns are samples}

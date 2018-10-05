@@ -257,6 +257,7 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   }
 }
 
+#' This function generates the reference. 
 #' @import matrixStats
 #' @param mat count matrix; rows are features and columns are samples
 #' @param ref.est reference estimate method
