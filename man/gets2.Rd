@@ -17,6 +17,8 @@ gets2(mat, design = model.matrix(mat[1, ] ~ 1), plot = F, ebs2 = T,
 \item{ebs2}{if regularization of variances needs to be performed.}
 
 \item{smoothed}{TRUE if all the variance estimates must be based on the mean-variance trend function.}
+
+\item{...}{other parameters}
 }
 \value{
 a vector with variance estimates for logged feature-wise counts.

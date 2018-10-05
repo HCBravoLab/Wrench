@@ -8,6 +8,9 @@
 #' @param thresh True if numerically one/zero probability occurrences must be thresholded
 #' @param thresh.val if thresh is true, the numerically one/zero probability occurrences is thresholded
 #'        to this value
+#' @param ... other parameters
+#' @import matrixStats
+#' @import stats
 #' @return A list with components:
 #'          \itemize{
 #'          \item{pi0.fit -  list with feature-wise glm.fit objects}
@@ -16,7 +19,7 @@
 #'
 getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
                       thresh=F, thresh.val=1e-8, ... ){
-  require(matrixStats)
+  # require(matrixStats)
 
   pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, c(1*(x==0)), family=binomial() ) )
   pi0 <- t(sapply( pi0.fit, function(x) x$fitted.values  ))
@@ -39,13 +42,19 @@ getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
 #'@param plot if the mean-variance trend function (the same as that of voom) needs to be plot.
 #'@param ebs2 if regularization of variances needs to be performed.
 #'@param smoothed TRUE if all the variance estimates must be based on the mean-variance trend function.
+#'@param ... other parameters
+#'@import matrixStats
+#'@import locfit
+#'@import limma
+#'@import stats
+#'@import graphics
 #'@return a vector with variance estimates for logged feature-wise counts.
 #'
 gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=F, ...){
 
-  require(matrixStats)
-  require(locfit)
-  require(limma)
+  # require(matrixStats)
+  # require(locfit)
+  # require(limma)
 
   p <- nrow(mat)
   nzrows <- rowSums(mat)>0
@@ -88,6 +97,7 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=
 #' Marginal weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
 #' @param z.adj TRUE if the result structure was generated with \code{wrench} with \code{z.adj} set to TRUE.
+#' @param ... other parameters
 getMargWeights <- function( res, z.adj, ...  ){
   with(res$others, {
     s2theta <- design %*% s2thetag
@@ -121,10 +131,14 @@ getCondLogWeights <- function( res ) {
   })
 }
 
-#' @export
+#' Get weighted means for matrix
+#' @param mat input matrix
+#' @param w weights
+#' @import matrixStats
+#' @import limma
 getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
-  require(matrixStats)
-  require(limma)
+  # require(matrixStats)
+  # require(limma)
   if( is.vector(w) ){
     w <- c(w)
     res <- colWeightedMeans( mat, w )
@@ -143,8 +157,10 @@ getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
 #' Obtain robust means. .
 #' @param res result structure of \code{wrench}
 #' @param estim.type estimator type
+#'@param ... other parameters
+#' @import matrixStats
 estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
-  require(matrixStats)
+  # require(matrixStats)
 
   if(estim.type=="s2.w.mean"){ #weights based on s2
     with(res$others, colWeightedMeans( radj, 1/s2 ))
@@ -241,9 +257,14 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   }
 }
 
-#'
+#' @import matrixStats
+#' @param mat count matrix; rows are features and columns are samples
+#' @param ref.est reference estimate method
+#' @param ... other parameters
+#' @import stats
+#' @import graphics
 getReference <- function( mat, ref.est="sw.means", ... ){
-  require(matrixStats)
+  # require(matrixStats)
   tots <- colSums(mat)
   if(ref.est=="logistic"){
     qref <- 1-plogis(
@@ -260,7 +281,8 @@ getReference <- function( mat, ref.est="sw.means", ... ){
   qref
 }
 
-#'
+#'@import stats
+#'@import graphics
 detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
   logccf <- log(ccf)
   logtau <- log(tau)
@@ -311,6 +333,9 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #'                (arises when considering positive-part expectations). Default recommended.
 #' @param detrend FALSE if any linear dependence between sample-depth and compositional factors needs to be removed.
 #'                (setting this to TRUE reduces variation in compositional factors and can improve accuracy, but requires an extra assumption that no linear dependence between compositional factors and sample depth is present in samples).
+#' @param ... other parameters
+#' @import matrixStats
+#' @import stats
 #' @return a \code{list} with components:
 #'         \itemize{
 #'         \item{ \code{nf}, \emph{normalization factors} for samples passed.
@@ -366,9 +391,9 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #' @author M. Senthil Kumar
 #' @export
 wrench <- function( mat, condition, etype="w.marg.mean",
-                    ebcf=T, z.adj=F, phi.adj=T, detrend=F, ... ){
+                    ebcf=TRUE, z.adj=FALSE, phi.adj=TRUE, detrend=FALSE, ... ){
 
-  require(matrixStats)
+  # require(matrixStats)
 
   #trim
   mat <- mat[rowSums(mat)>0,]
@@ -423,7 +448,7 @@ wrench <- function( mat, condition, etype="w.marg.mean",
     thetagj <- exp( sapply(seq(n), function(j){
       x <- log(r[,j])
       x[!is.finite(x)] <- NA
-      weighted.mean( x, w=1/(s2+s2thetag_rep[j]), na.rm=T )
+      weighted.mean( x, w=1/(s2+s2thetag_rep[j]), na.rm=TRUE )
     }))
 
     p <- nrow(r)

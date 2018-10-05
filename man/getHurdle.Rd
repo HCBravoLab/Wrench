@@ -16,6 +16,8 @@ getHurdle(mat, hdesign = model.matrix(~-1 + log(colSums(mat))),
 
 \item{thresh.val}{if thresh is true, the numerically one/zero probability occurrences is thresholded
 to this value}
+
+\item{...}{other parameters}
 }
 \value{
 A list with components:

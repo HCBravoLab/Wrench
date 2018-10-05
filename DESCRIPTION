@@ -13,7 +13,9 @@ Description: Wrench is a package for normalization sparse genomic count data, li
 Imports: 
 	 limma,
 	 matrixStats,
-	 locfit
+	 locfit,
+	 stats,
+	 graphics
 License: Artistic-2.0
 LazyData: TRUE
 RoxygenNote: 6.1.0
@@ -21,4 +23,4 @@ Suggests: knitr, rmarkdown, metagenomeSeq, DESeq2, edgeR
 Collate: 
 	 'wrenchSource.R'
 VignetteBuilder: knitr
-biocViews: software
+biocViews: Software

@@ -10,6 +10,8 @@ estimSummary(res, estim.type = "s2.w.mean", ...)
 \item{res}{result structure of \code{wrench}}
 
 \item{estim.type}{estimator type}
+
+\item{...}{other parameters}
 }
 \description{
 Obtain robust means. .

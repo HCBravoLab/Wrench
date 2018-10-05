@@ -10,6 +10,8 @@ getMargWeights(res, z.adj, ...)
 \item{res}{result structure of \code{wrench}}
 
 \item{z.adj}{TRUE if the result structure was generated with \code{wrench} with \code{z.adj} set to TRUE.}
+
+\item{...}{other parameters}
 }
 \description{
 Marginal weight computations for wrench estimators.

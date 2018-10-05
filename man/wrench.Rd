@@ -31,6 +31,8 @@ by hurdle probabilities (arises when taking marginal expectation). Default recom
 
 \item{detrend}{FALSE if any linear dependence between sample-depth and compositional factors needs to be removed.
 (setting this to TRUE reduces variation in compositional factors and can improve accuracy, but requires an extra assumption that no linear dependence between compositional factors and sample depth is present in samples).}
+
+\item{...}{other parameters}
 }
 \value{
 a \code{list} with components:
