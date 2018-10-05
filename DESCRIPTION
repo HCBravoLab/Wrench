@@ -23,4 +23,4 @@ Suggests: knitr, rmarkdown, metagenomeSeq, DESeq2, edgeR
 Collate: 
 	 'wrenchSource.R'
 VignetteBuilder: knitr
-biocViews: Software
+biocViews: Normalization, Sequencing, Software
