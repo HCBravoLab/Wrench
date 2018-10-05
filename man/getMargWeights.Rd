@@ -14,4 +14,3 @@ getMargWeights(res, z.adj, ...)
 \description{
 Marginal weight computations for wrench estimators.
 }
-

@@ -24,4 +24,3 @@ a vector with variance estimates for logged feature-wise counts.
 \description{
 Obtain variances of logged counts.
 }
-

@@ -5,7 +5,7 @@
 \title{Normalization for sparse, under-sampled count data.}
 \usage{
 wrench(mat, condition, etype = "w.marg.mean", ebcf = T, z.adj = F,
-  phi.adj = T, ...)
+  phi.adj = T, detrend = F, ...)
 }
 \arguments{
 \item{mat}{count matrix; rows are features and columns are samples}
@@ -28,6 +28,9 @@ by hurdle probabilities (arises when taking marginal expectation). Default recom
 
 \item{phi.adj}{TRUE if estimates need to be adjusted for variance terms
 (arises when considering positive-part expectations). Default recommended.}
+
+\item{detrend}{FALSE if any linear dependence between sample-depth and compositional factors needs to be removed.
+(setting this to TRUE reduces variation in compositional factors and can improve accuracy, but requires an extra assumption that no linear dependence between compositional factors and sample depth is present in samples).}
 }
 \value{
 a \code{list} with components:
@@ -75,17 +78,14 @@ edgerobj <- DGEList( counts=cntsMatrix,
 #If using DESeq/DESeq2
 require(DESeq2)
 deseq.obj <- DESeqDataSetFromMatrix(countData = cntsMatrix,
-                                   colData = group,
-                                   design=as.formula(paste("~",diet))
-)
-sizeFactors( deseq.obj  ) <- normFactors
-
+                                   DataFrame(group),
+                                   ~ group )
+DESeq2::sizeFactors(deseq.obj) <- normalizationFactors
 #If using metagenomeSeq
 normalizedObject <- mouseData
-pData(normalizedObject@expSummary$expSummary)$normFactors <- normFactors
+pData(normalizedObject@expSummary$expSummary)$normFactors <- normalizationFactors
 
 }
 \author{
 M. Senthil Kumar
 }
-

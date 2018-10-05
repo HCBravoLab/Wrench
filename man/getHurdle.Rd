@@ -4,8 +4,8 @@
 \alias{getHurdle}
 \title{Obtains logistic fits for presence/absence and fitted probabilities of a zero occurring.}
 \usage{
-getHurdle(mat, hdesign = model.matrix(~-1 + log(colSums(mat))), thresh = F,
-  thresh.val = 1e-08, ...)
+getHurdle(mat, hdesign = model.matrix(~-1 + log(colSums(mat))),
+  thresh = F, thresh.val = 1e-08, ...)
 }
 \arguments{
 \item{mat}{count matrix}
@@ -29,4 +29,3 @@ This function is used to derive weights for feature-wise compositional estimates
 intention is to derive these based on average occurrences across the dataset, as just a function
 of sample depth, and not with particular relevance to groups.
 }
-

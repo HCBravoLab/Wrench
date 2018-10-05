@@ -14,4 +14,3 @@ estimSummary(res, estim.type = "s2.w.mean", ...)
 \description{
 Obtain robust means. .
 }
-

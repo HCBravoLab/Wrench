@@ -14,13 +14,17 @@
 #'          \item{pi0 - matrix with fitted probabilities}
 #'          }
 #'
-#' @export
 getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
                       thresh=F, thresh.val=1e-8, ... ){
   require(matrixStats)
 
   pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, c(1*(x==0)), family=binomial() ) )
   pi0 <- t(sapply( pi0.fit, function(x) x$fitted.values  ))
+
+  #tau <- colSums(mat)
+  #pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, cbind( tau-x, x ), family=binomial() ) )
+  #pi0 <- t(sapply( pi0.fit, function(x) exp(tau*log(x$fitted.values)) ) )
+
   if(thresh){
     pi0[pi0>1-thresh.val] <- 1-thresh.val
     pi0[pi0<thresh.val] <- thresh.val
@@ -37,7 +41,6 @@ getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
 #'@param smoothed TRUE if all the variance estimates must be based on the mean-variance trend function.
 #'@return a vector with variance estimates for logged feature-wise counts.
 #'
-#'@export
 gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=F, ...){
 
   require(matrixStats)
@@ -85,7 +88,6 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=
 #' Marginal weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
 #' @param z.adj TRUE if the result structure was generated with \code{wrench} with \code{z.adj} set to TRUE.
-#' @export
 getMargWeights <- function( res, z.adj, ...  ){
   with(res$others, {
     s2theta <- design %*% s2thetag
@@ -103,7 +105,6 @@ getMargWeights <- function( res, z.adj, ...  ){
 
 #' Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
-#' @export
 getCondWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
@@ -113,7 +114,6 @@ getCondWeights <- function( res ) {
 
 #' Log Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
-#' @export
 getCondLogWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
@@ -143,7 +143,6 @@ getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
 #' Obtain robust means. .
 #' @param res result structure of \code{wrench}
 #' @param estim.type estimator type
-#' @export
 estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   require(matrixStats)
 
@@ -242,7 +241,7 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   }
 }
 
-#' @export
+#'
 getReference <- function( mat, ref.est="sw.means", ... ){
   require(matrixStats)
   tots <- colSums(mat)
@@ -259,6 +258,35 @@ getReference <- function( mat, ref.est="sw.means", ... ){
     stop("Unknown reference type.")
   }
   qref
+}
+
+#'
+detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
+  logccf <- log(ccf)
+  logtau <- log(tau)
+  grp <- as.factor(grp)
+  df <- data.frame("logccf"=logccf, "grp"=grp, "logtau"=logtau)
+
+  for( g in levels(df$grp) ){ #fit lm and remove trend
+    g.indcs <- which(df$grp==g)
+    g.sub <- df[g.indcs, ]
+    g.fit <- lm( logccf ~ logtau, data=g.sub )
+    pred.values <- predict( g.fit )
+    if(plt.detrends.all){
+      plot( g.sub$logccf ~ g.sub$logtau, col = "black" )
+      points( pred.values ~ g.sub$logtau, col = "red", pch=19 )
+    }
+
+    max.tau.indx <- which.max( g.sub$logtau )
+    g.sub$logccf <- g.sub$logccf + ( pred.values[max.tau.indx] - pred.values )
+    df$logccf[g.indcs] <- g.sub$logccf
+  }
+
+  ccfs.detr <- exp(df$logccf)
+  res <- list()
+  res$ccf.detr.un <- ccfs.detr
+  res$ccf.detr <- ccfs.detr / exp( mean(log(ccfs.detr)) )
+  res
 }
 
 #' @title Normalization for sparse, under-sampled count data.
@@ -281,6 +309,8 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 #'              by hurdle probabilities (arises when taking marginal expectation). Default recommended.
 #' @param phi.adj TRUE if estimates need to be adjusted for variance terms
 #'                (arises when considering positive-part expectations). Default recommended.
+#' @param detrend FALSE if any linear dependence between sample-depth and compositional factors needs to be removed.
+#'                (setting this to TRUE reduces variation in compositional factors and can improve accuracy, but requires an extra assumption that no linear dependence between compositional factors and sample depth is present in samples).
 #' @return a \code{list} with components:
 #'         \itemize{
 #'         \item{ \code{nf}, \emph{normalization factors} for samples passed.
@@ -324,20 +354,20 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 #' #If using DESeq/DESeq2
 #'require(DESeq2)
 #'deseq.obj <- DESeqDataSetFromMatrix(countData = cntsMatrix,
-#'                                    colData = group,
-#'                                    design=as.formula(paste("~",diet))
-#')
-#'sizeFactors( deseq.obj  ) <- normFactors
-#'
+#'                                    DataFrame(group),
+#'                                    ~ group )
+#'DESeq2::sizeFactors(deseq.obj) <- normalizationFactors
+
+
 #' #If using metagenomeSeq
 #' normalizedObject <- mouseData
-#' pData(normalizedObject@expSummary$expSummary)$normFactors <- normFactors
+#' pData(normalizedObject@expSummary$expSummary)$normFactors <- normalizationFactors
 #'
 
 #' @author M. Senthil Kumar
 #' @export
 wrench <- function( mat, condition, etype="w.marg.mean",
-                    ebcf=T, z.adj=F, phi.adj=T, ... ){
+                    ebcf=T, z.adj=F, phi.adj=T, detrend=F, ... ){
 
   require(matrixStats)
 
@@ -400,7 +430,7 @@ wrench <- function( mat, condition, etype="w.marg.mean",
     p <- nrow(r)
     thetagi <- t( sapply(seq(p), function(i){
       exp(
-        (s2thetag/(s2[i]+s2thetag))*( log(r[i,]) - log(thetagj) )
+        (s2thetag_rep/(s2[i]+s2thetag_rep))*( log(r[i,]) - log(thetagj) )
       )
     }) )
 
@@ -443,6 +473,14 @@ wrench <- function( mat, condition, etype="w.marg.mean",
 
   res$ccf <- estimSummary( res, estim.type = etype, z.adj=z.adj, ... )
   res$ccf <- with(res, ccf/exp(mean(log(ccf))))
+
+  if( detrend ){
+    res$others$ccf0 <- res$ccf
+    detrended <- detrend.ccf( res$ccf, tots, condition )
+    res$others$ccf.detr.un <- detrended$ccf.detr.un
+    res$ccf <- detrended$ccf.detr
+  }
+
   tjs <- colSums(mat)/exp(mean(log(colSums(mat))))
   res$nf <- res$ccf * tjs
 

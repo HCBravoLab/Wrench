@@ -1,0 +1,190 @@
+* using log directory ‘/Users/senthil/Documents/research/software/Wrench/..Rcheck’
+* using R version 3.5.0 (2018-04-23)
+* using platform: x86_64-apple-darwin15.6.0 (64-bit)
+* using session charset: UTF-8
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘Wrench’ version ‘0.1.0’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... WARNING
+Found the following executable files:
+  .git/objects/04/16e4d08af0772f2eb9debacea183a47214a12c
+  .git/objects/0c/f43a188b646f00fc8d9af795b3a359fc8a2b5c
+  .git/objects/0f/a7c4b8817591c2dff2b3997d2566320ac6d9fc
+  .git/objects/16/db764fba03040751ee3fb30106985496429777
+  .git/objects/17/43e40fec30e357993d33f5cb053bf027524dc8
+  .git/objects/1b/7b09709ab2260a4cb5f7bf5bb41ac45519b542
+  .git/objects/1f/2ae88fec4b3cd5a44e21b82479533ba99aa10a
+  .git/objects/27/0314b87d171300f76501b32e8a0354926d9c84
+  .git/objects/2b/1bef112ac6921abda6162a65dbfcd8c6d55c80
+  .git/objects/32/960f8ced39dd5eade0f15d41e275b2dc8d4c70
+  .git/objects/3e/51567f2511d23801ef76a95a38c3d846c3f0af
+  .git/objects/47/54fd8fba93f13fddadbe5d494df2f3413179bf
+  .git/objects/4d/396b1b472e3b737c9b594ce4b30da3722db6a1
+  .git/objects/51/b6264ff8f0d45d315b98f33223103001effe75
+  .git/objects/55/0d1da5e6fd49a4408b0c08a955107c3dcba919
+  .git/objects/55/28aea2ba53c044f500e2c6c10b5679ec78cffc
+  .git/objects/5b/5e33b5ac36748c692535abb2eefb5590418069
+  .git/objects/5f/21f57e856114f153fc452676aaaf431d984468
+  .git/objects/67/2b5e2ee5d6d070202d547af6e63e2915a9220a
+  .git/objects/69/a70e6ee5ece5ce59744e34dea8ca478c43915a
+  .git/objects/7a/73a41bfdf76d6f793007240d80983a52f15f97
+  .git/objects/91/114bf2f2bba5e0c5252e75018da19b869776f1
+  .git/objects/9e/9290b318336e121732495045bc5d19dd25e504
+  .git/objects/b5/67d6306f10acc79adb0088c7116769c667c134
+  .git/objects/b5/844c2799ca14b45c5061c9707746bcc0cdf940
+  .git/objects/b6/025b8f698962fa64180524c9161c7f0a4d95db
+  .git/objects/b8/962e3bea1eb024117a92b49d4825dc3514ddd9
+  .git/objects/d1/b6bee7d88993adefc2dc2c08d084e6c35bfa0e
+  .git/objects/d4/94fdcbaec0572e20f072af6d0f143ac392e6cb
+  .git/objects/dd/4ff764f2f481bff10a8a6f7f31daed61308103
+  .git/objects/dd/838aab2bb930a1ca7b202f3754dc895ecb50e1
+  .git/objects/e4/02d5d8ec32361c82e13d0f8ee047e37fd831e2
+  .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+  .git/objects/f7/f2d73dc6f59a0fa63d4511c639da453f6cb5bb
+  .git/objects/fa/ee0782b750c090388508ec3ce8cbbfb56a9669
+  .git/objects/fb/2062c6ffc07ff366a450c025aea6bb091055ea
+  .git/objects/ff/fa4e5a29ed868ba62eca99520498a3ef1250e8
+Source packages should not contain undeclared executable files.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .RData
+  .Rhistory
+  .gitignore
+  ..Rcheck
+  .Rproj.user
+  .git
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... NOTE
+Found the following non-portable file path:
+  Wrench/.Rproj.user/shared/notebooks/AE4DB0C9-WrenchPaperAnalysesFinalAug292018/1/AB86B9C4/chunks.json
+
+Tarballs are only required to store paths of up to 100 bytes and cannot
+store those of more than 256 bytes, with restrictions including to 100
+bytes for the final component.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘Wrench’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Malformed Description field: should contain one or more complete sentences.
+Non-standard license specification:
+  What license is it under?
+Standardizable: FALSE
+Checking should be performed on sources prepared by ‘R CMD build’.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking dependencies in R code ... WARNING
+'::' or ':::' import not declared from: ‘limma’
+'library' or 'require' calls not declared from:
+  ‘limma’ ‘locfit’ ‘matrixStats’
+'library' or 'require' calls in package code:
+  ‘limma’ ‘locfit’ ‘matrixStats’
+  Please use :: or requireNamespace() instead.
+  See section 'Suggested packages' in the 'Writing R Extensions' manual.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+detrend.ccf: no visible global function definition for ‘lm’
+detrend.ccf: no visible global function definition for ‘predict’
+detrend.ccf: no visible global function definition for ‘plot’
+detrend.ccf: no visible global function definition for ‘points’
+getHurdle: no visible global function definition for ‘model.matrix’
+getHurdle : <anonymous>: no visible global function definition for
+  ‘glm.fit’
+getHurdle : <anonymous>: no visible global function definition for
+  ‘binomial’
+getReference: no visible global function definition for ‘plogis’
+getReference : <anonymous>: no visible global function definition for
+  ‘glm’
+getReference : <anonymous>: no visible global function definition for
+  ‘binomial’
+getWeightedMean: no visible global function definition for
+  ‘colWeightedMeans’
+getWeightedMean : <anonymous>: no visible global function definition
+  for ‘weighted.mean’
+gets2: no visible global function definition for ‘model.matrix’
+gets2: no visible global function definition for ‘lmFit’
+gets2: no visible global function definition for ‘locfit’
+gets2: no visible global function definition for ‘lines’
+gets2: no visible global function definition for ‘predict’
+wrench: no visible global function definition for ‘model.matrix’
+wrench: no visible global function definition for ‘colVars’
+wrench : <anonymous>: no visible global function definition for
+  ‘weighted.mean’
+Undefined global functions or variables:
+  binomial colVars colWeightedMeans glm glm.fit lines lm lmFit locfit
+  model.matrix plogis plot points predict weighted.mean
+Consider adding
+  importFrom("graphics", "lines", "plot", "points")
+  importFrom("stats", "binomial", "glm", "glm.fit", "lm", "model.matrix",
+             "plogis", "predict", "weighted.mean")
+to your NAMESPACE file.
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘getWeightedMean’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'estimSummary'
+  ‘...’
+
+Undocumented arguments in documentation object 'getHurdle'
+  ‘...’
+
+Undocumented arguments in documentation object 'getMargWeights'
+  ‘...’
+
+Undocumented arguments in documentation object 'gets2'
+  ‘...’
+
+Undocumented arguments in documentation object 'wrench'
+  ‘...’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... WARNING
+'::' or ':::' import not declared from: ‘DESeq2’
+'library' or 'require' calls not declared from:
+  ‘DESeq2’ ‘edgeR’ ‘metagenomeSeq’
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... OK
+* checking for unstated dependencies in vignettes ... NOTE
+'::' or ':::' import not declared from: ‘DESeq2’
+'library' or 'require' calls not declared from:
+  ‘DESeq2’ ‘edgeR’ ‘metagenomeSeq’
+* checking package vignettes in ‘inst/doc’ ... OK
+* checking running R code from vignettes ... NONE
+* checking re-building of vignette outputs ... OK
+* checking PDF version of manual ... OK
+* DONE
+Status: 6 WARNINGs, 5 NOTEs
