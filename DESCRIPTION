@@ -1,7 +1,7 @@
 Package: Wrench
 Type: Package
 Title: Wrench normalization for sparse count data
-Version: 0.99.0
+Version: 0.99.1
 Authors@R: c( person("Senthil Kumar", "Muthiah",
                       email="smuthiah@umiacs.umd.edu",
                       role = c("aut")),
