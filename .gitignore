@@ -3,5 +3,5 @@
 .RData
 .Ruserdata
 ..Rcheck
-.Rbuildignore
 .Rhistory
+.Rproj.user

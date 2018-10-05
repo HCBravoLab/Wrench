@@ -344,6 +344,11 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #'# commonly used tools is shown below.
 #'
 
+#' #If using metagenomeSeq
+#' normalizedObject <- mouseData
+#' normFactors(normalizedObject) <- normalizationFactors
+#'
+
 #' #If using edgeR, we must pass in the compositional factors
 #'require(edgeR)
 #'edgerobj <- DGEList( counts=cntsMatrix,
@@ -357,12 +362,6 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #'                                    DataFrame(group),
 #'                                    ~ group )
 #'DESeq2::sizeFactors(deseq.obj) <- normalizationFactors
-
-
-#' #If using metagenomeSeq
-#' normalizedObject <- mouseData
-#' pData(normalizedObject@expSummary$expSummary)$normFactors <- normalizationFactors
-#'
 
 #' @author M. Senthil Kumar
 #' @export

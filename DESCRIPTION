@@ -1,13 +1,24 @@
 Package: Wrench
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Wrench normalization for sparse count data
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: c( person("Senthil Kumar", "Muthiah",
+                      email="smuthiah@umiacs.umd.edu",
+                      role = c("aut")),
+              person("Hector", "Corrada Bravo", 
+                      email = "hcorrada@gmail.com", 
+                      role = c("aut", "cre"))
+            )
+Description: Wrench is a package for normalization sparse genomic count data, like that arising from 16s metagenomic surveys.
+Imports: 
+	 limma,
+	 matrixStats,
+	 locfit
+License: Artistic-2.0
 LazyData: TRUE
 RoxygenNote: 6.1.0
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, metagenomeSeq, DESeq2, edgeR
+Collate: 
+	 'wrenchSource.R'
 VignetteBuilder: knitr
 biocViews: software

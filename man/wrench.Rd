@@ -69,6 +69,10 @@ normalizationFactors <- W$nf
 #Introducing the above normalization factors for the most
 # commonly used tools is shown below.
 
+#If using metagenomeSeq
+normalizedObject <- mouseData
+normFactors(normalizedObject) <- normalizationFactors
+
 #If using edgeR, we must pass in the compositional factors
 require(edgeR)
 edgerobj <- DGEList( counts=cntsMatrix,
@@ -81,10 +85,6 @@ deseq.obj <- DESeqDataSetFromMatrix(countData = cntsMatrix,
                                    DataFrame(group),
                                    ~ group )
 DESeq2::sizeFactors(deseq.obj) <- normalizationFactors
-#If using metagenomeSeq
-normalizedObject <- mouseData
-pData(normalizedObject@expSummary$expSummary)$normFactors <- normalizationFactors
-
 }
 \author{
 M. Senthil Kumar

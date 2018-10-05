@@ -9,7 +9,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r setup, include=FALSE}
+```{r setup}
 knitr::opts_chunk$set(echo = TRUE)
 
 require(metagenomeSeq)
@@ -61,7 +61,7 @@ edgerobj <- DGEList( counts=counts,
                      norm.factors=compositionalFactors )
 
 # -- If using DESeq/DESeq2
-deseq.obj <- DESeqDataSetFromMatrix(countData = counts,
+deseq.obj <- DESeq2::DESeqDataSetFromMatrix(countData = counts,
                                    DataFrame(group),
                                    ~ group )
 sizeFactors(deseq.obj) <- normalizationFactors
