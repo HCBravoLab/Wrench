@@ -98,6 +98,7 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=FALSE, ebs2=TRUE, sm
 #' @param res result structure of \code{wrench}
 #' @param z.adj TRUE if the result structure was generated with \code{wrench} with \code{z.adj} set to TRUE.
 #' @param ... other parameters
+#' @return inverse marginal variances for robust mean computing
 getMargWeights <- function( res, z.adj, ...  ){
   with(res$others, {
     s2theta <- design %*% s2thetag
@@ -124,6 +125,7 @@ getCondWeights <- function( res ) {
 
 #' Log Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
+#' @return inverse variance weights when using positive conditional models. 
 getCondLogWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
@@ -136,6 +138,7 @@ getCondLogWeights <- function( res ) {
 #' @param w weights
 #' @import matrixStats
 #' @import limma
+#' @return column-wise weighted means.  
 getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
   # require(matrixStats)
   # require(limma)
@@ -157,8 +160,9 @@ getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
 #' Obtain robust means. .
 #' @param res result structure of \code{wrench}
 #' @param estim.type estimator type
-#'@param ... other parameters
+#' @param ... other parameters
 #' @import matrixStats
+#' @return a chosen summary statistic 
 estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
   # require(matrixStats)
 
