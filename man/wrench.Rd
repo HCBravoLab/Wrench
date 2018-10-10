@@ -4,8 +4,8 @@
 \alias{wrench}
 \title{Normalization for sparse, under-sampled count data.}
 \usage{
-wrench(mat, condition, etype = "w.marg.mean", ebcf = T, z.adj = F,
-  phi.adj = T, detrend = F, ...)
+wrench(mat, condition, etype = "w.marg.mean", ebcf = TRUE,
+  z.adj = FALSE, phi.adj = TRUE, detrend = FALSE, ...)
 }
 \arguments{
 \item{mat}{count matrix; rows are features and columns are samples}
@@ -16,7 +16,7 @@ wrench(mat, condition, etype = "w.marg.mean", ebcf = T, z.adj = F,
 \itemize{
 \item{ hurdle.w.mean, the W1 estimator in manuscript.}
 \item{ w.marg.mean, the W2 estimator in manuscript. These are appropriately computed depending on
-                     whether \code{z.adj}=T (see below)
+                     whether \code{z.adj}=TRUE (see below)
 }
 \item{s2.w.mean, weight by inverse of feature-variances of logged count data. }
 }}

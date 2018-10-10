@@ -36,7 +36,7 @@ Below, we present a quick tutorial, where we pass count data, and group informat
 ```{r, warning=FALSE}
 #extract count and group information for from the mouse microbiome data in the metagenomeSeq package
 data(mouseData)
-counts <- MRcounts( mouseData, norm=F ) 
+counts <- MRcounts( mouseData, norm=FALSE ) 
 group <- pData(mouseData)$diet
 
 #Running wrench with defaults

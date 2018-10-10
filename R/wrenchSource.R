@@ -18,7 +18,7 @@
 #'          }
 #'
 getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
-                      thresh=F, thresh.val=1e-8, ... ){
+                      thresh=FALSE, thresh.val=1e-8, ... ){
   # require(matrixStats)
 
   pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, c(1*(x==0)), family=binomial() ) )
@@ -50,7 +50,7 @@ getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
 #'@import graphics
 #'@return a vector with variance estimates for logged feature-wise counts.
 #'
-gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=F, ...){
+gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=FALSE, ebs2=TRUE, smoothed=FALSE, ...){
 
   # require(matrixStats)
   # require(locfit)
@@ -69,7 +69,7 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=
   fit <- lmFit( mat, design  )
   s <- fit$sigma
   s[s==0] <- NA
-  mu <- rowMeans( mat, na.rm=T )
+  mu <- rowMeans( mat, na.rm=TRUE )
 
   sqrt.s <- sqrt(s)
   l <- locfit(sqrt.s~mu, family="gamma")
@@ -86,7 +86,7 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=F, ebs2=T, smoothed=
     s2 <- s^2
     s2[is.na(s2)] <- k[is.na(s2)]
     if(ebs2){
-      s2 <- limma::squeezeVar(s2, df = max(c(1, fit$df.residual), na.rm=T) )$var.post
+      s2 <- limma::squeezeVar(s2, df = max(c(1, fit$df.residual), na.rm=TRUE) )$var.post
     }
   }
   s2.tmp <- c(matrix(NA, nrow=p, ncol=1))
@@ -148,7 +148,7 @@ getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
       wj <- w[,j]
       yj <- yj[!is.na(w)]
       wj <- wj[!is.na(w)]
-      weighted.mean( yj, wj, na.rm=T )
+      weighted.mean( yj, wj, na.rm=TRUE )
     } )
   }
   return(res)
@@ -229,7 +229,7 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
         w <- W[,j]
         y <- y[!is.na(w)]
         w <- w[!is.na(w)]
-        exp(weighted.median( y, w, na.rm=T ))
+        exp(weighted.median( y, w, na.rm=TRUE ))
       } )
     })
   } else if( estim.type=="w.cond.log.mean"){
@@ -241,7 +241,7 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
         w <- W[,j]
         y <- y[!is.na(w)]
         w <- w[!is.na(w)]
-        exp(weighted.mean( y, w, na.rm=T ))
+        exp(weighted.mean( y, w, na.rm=TRUE ))
       } )
     })
   } else if( estim.type=="hurdle.w.mean"  ){
@@ -283,7 +283,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 
 #'@import stats
 #'@import graphics
-detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
+detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=FALSE){
   logccf <- log(ccf)
   logtau <- log(tau)
   grp <- as.factor(grp)
@@ -322,7 +322,7 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=F){
 #'        \itemize{
 #'        \item{ hurdle.w.mean, the W1 estimator in manuscript.}
 #'        \item{ w.marg.mean, the W2 estimator in manuscript. These are appropriately computed depending on
-#'                             whether \code{z.adj}=T (see below)
+#'                             whether \code{z.adj}=TRUE (see below)
 #'        }
 #'        \item{s2.w.mean, weight by inverse of feature-variances of logged count data. }
 #'        }
@@ -437,7 +437,7 @@ wrench <- function( mat, condition, etype="w.marg.mean",
     rg <- qg/qref
     lrg <- log(rg)
     lrg[!is.finite(lrg)] <- NA
-    s2thetag <- colVars(lrg, na.rm=T)
+    s2thetag <- colVars(lrg, na.rm=TRUE)
     s2thetag_rep <- design %*% s2thetag
 
     thetag <- colMeans(rg)

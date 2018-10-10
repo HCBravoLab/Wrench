@@ -5,7 +5,7 @@
 \title{Obtains logistic fits for presence/absence and fitted probabilities of a zero occurring.}
 \usage{
 getHurdle(mat, hdesign = model.matrix(~-1 + log(colSums(mat))),
-  thresh = F, thresh.val = 1e-08, ...)
+  thresh = FALSE, thresh.val = 1e-08, ...)
 }
 \arguments{
 \item{mat}{count matrix}

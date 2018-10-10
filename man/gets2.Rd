@@ -4,8 +4,8 @@
 \alias{gets2}
 \title{Obtain variances of logged counts.}
 \usage{
-gets2(mat, design = model.matrix(mat[1, ] ~ 1), plot = F, ebs2 = T,
-  smoothed = F, ...)
+gets2(mat, design = model.matrix(mat[1, ] ~ 1), plot = FALSE,
+  ebs2 = TRUE, smoothed = FALSE, ...)
 }
 \arguments{
 \item{mat}{count matrix; rows are features and columns are samples.}
