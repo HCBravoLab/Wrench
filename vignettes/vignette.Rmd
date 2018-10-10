@@ -56,7 +56,7 @@ normalizedObject <- mouseData
 normFactors(normalizedObject) <- normalizationFactors
 
 # -- If using edgeR, we must pass in the compositional factors
-edgerobj <- DGEList( counts=counts,
+edgerobj <- edgeR::DGEList( counts=counts,
                      group = as.matrix(group),
                      norm.factors=compositionalFactors )
 
