@@ -11,6 +11,9 @@ getWeightedMean(mat, w = rep(1, nrow(mat)))
 
 \item{w}{weights}
 }
+\value{
+column-wise weighted means.
+}
 \description{
 Get weighted means for matrix
 }

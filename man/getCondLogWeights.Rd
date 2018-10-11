@@ -9,6 +9,9 @@ getCondLogWeights(res)
 \arguments{
 \item{res}{result structure of \code{wrench}}
 }
+\value{
+inverse variance weights when using positive conditional models.
+}
 \description{
 Log Postive-conditional weight computations for wrench estimators.
 }

@@ -116,6 +116,7 @@ getMargWeights <- function( res, z.adj, ...  ){
 
 #' Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
+#' @return positive conditional weights for each sample
 getCondWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA

@@ -13,6 +13,9 @@ estimSummary(res, estim.type = "s2.w.mean", ...)
 
 \item{...}{other parameters}
 }
+\value{
+a chosen summary statistic
+}
 \description{
 Obtain robust means. .
 }

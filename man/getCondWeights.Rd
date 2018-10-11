@@ -9,6 +9,9 @@ getCondWeights(res)
 \arguments{
 \item{res}{result structure of \code{wrench}}
 }
+\value{
+positive conditional weights for each sample
+}
 \description{
 Postive-conditional weight computations for wrench estimators.
 }

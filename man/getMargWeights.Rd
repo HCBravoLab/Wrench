@@ -13,6 +13,9 @@ getMargWeights(res, z.adj, ...)
 
 \item{...}{other parameters}
 }
+\value{
+inverse marginal variances for robust mean computing
+}
 \description{
 Marginal weight computations for wrench estimators.
 }
