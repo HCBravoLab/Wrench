@@ -5,7 +5,8 @@
 #' of sample depth, and not with particular relevance to groups.
 #' @param mat count matrix
 #' @param hdesign design matrix for the logistic; the default is usually sufficient.
-#' @param thresh True if numerically one/zero probability occurrences must be thresholded
+#' @param pres.abs.mod TRUE if glm regression is for presence or absence. FALSE if glm regression is for counts. 
+#' @param thresh TRUE if numerically one/zero probability occurrences must be thresholded
 #' @param thresh.val if thresh is true, the numerically one/zero probability occurrences is thresholded
 #'        to this value
 #' @param ... other parameters
@@ -17,17 +18,19 @@
 #'          \item{pi0 - matrix with fitted probabilities}
 #'          }
 #'
-getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
+.getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
+                      pres.abs.mod=TRUE,
                       thresh=FALSE, thresh.val=1e-8, ... ){
-  # require(matrixStats)
-
-  pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, c(1*(x==0)), family=binomial() ) )
-  pi0 <- t(sapply( pi0.fit, function(x) x$fitted.values  ))
-
-  #tau <- colSums(mat)
-  #pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, cbind( tau-x, x ), family=binomial() ) )
-  #pi0 <- t(sapply( pi0.fit, function(x) exp(tau*log(x$fitted.values)) ) )
-
+  n <- ncol(mat)
+  if(pres.abs.mod){
+    pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, c(1*(x==0)), family=binomial() ) )
+    pi0 <- t( vapply( pi0.fit, function(x) x$fitted.values, FUN.VALUE = numeric(n)  ) )  
+  } else {
+    tau <- colSums(mat)
+    pi0.fit <- apply(mat, 1, function(x) glm.fit( hdesign, cbind( tau-x, x ), family=binomial() ) )
+    pi0 <- t( vapply( pi0.fit, function(x) exp(tau*log(x$fitted.values)), FUN.VALUE = numeric(n) ) )  
+  }
+  
   if(thresh){
     pi0[pi0>1-thresh.val] <- 1-thresh.val
     pi0[pi0<thresh.val] <- thresh.val
@@ -50,11 +53,7 @@ getHurdle <- function(mat, hdesign=model.matrix( ~-1+log(colSums(mat)) ),
 #'@import graphics
 #'@return a vector with variance estimates for logged feature-wise counts.
 #'
-gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=FALSE, ebs2=TRUE, smoothed=FALSE, ...){
-
-  # require(matrixStats)
-  # require(locfit)
-  # require(limma)
+.gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=FALSE, ebs2=TRUE, smoothed=FALSE, ...){
 
   p <- nrow(mat)
   nzrows <- rowSums(mat)>0
@@ -99,7 +98,7 @@ gets2 <- function(mat, design=model.matrix(mat[1,]~1), plot=FALSE, ebs2=TRUE, sm
 #' @param z.adj TRUE if the result structure was generated with \code{wrench} with \code{z.adj} set to TRUE.
 #' @param ... other parameters
 #' @return inverse marginal variances for robust mean computing
-getMargWeights <- function( res, z.adj, ...  ){
+.getMargWeights <- function( res, z.adj, ...  ){
   with(res$others, {
     s2theta <- design %*% s2thetag
     tmp <- exp( sweep( replicate( nrow(design), s2 ), 2, s2theta, "+" ))-1
@@ -117,7 +116,7 @@ getMargWeights <- function( res, z.adj, ...  ){
 #' Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
 #' @return positive conditional weights for each sample
-getCondWeights <- function( res ) {
+.getCondWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
     (1-pi0)/(( pi0 + replicate( nrow(design), exp(s2) ) -1 )*(radj^2))
@@ -127,7 +126,7 @@ getCondWeights <- function( res ) {
 #' Log Postive-conditional weight computations for wrench estimators.
 #' @param res result structure of \code{wrench}
 #' @return inverse variance weights when using positive conditional models. 
-getCondLogWeights <- function( res ) {
+.getCondLogWeights <- function( res ) {
   with(res$others, {
     radj[radj==0] <- NA
     (1-pi0)/(( pi0 + replicate( nrow(design), exp(s2) ) -1 ))
@@ -140,23 +139,48 @@ getCondLogWeights <- function( res ) {
 #' @import matrixStats
 #' @import limma
 #' @return column-wise weighted means.  
-getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
-  # require(matrixStats)
-  # require(limma)
+.getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
+  
   if( is.vector(w) ){
     w <- c(w)
     res <- colWeightedMeans( mat, w )
   } else {
-    res <- sapply( seq(ncol(mat)), function(j){
+    res <- vapply( seq(ncol(mat)), function(j){
       yj <- mat[,j]
       wj <- w[,j]
-      yj <- yj[!is.na(w)]
-      wj <- wj[!is.na(w)]
+      indx <- which( is.finite(yj) & (!is.na(wj)) ) 
+      yj <- yj[indx]
+      wj <- wj[indx]
       weighted.mean( yj, wj, na.rm=TRUE )
-    } )
+    }, FUN.VALUE = numeric(1) )
   }
   return(res)
 }
+
+#' Get weighted median for matrix
+#' @param mat input matrix
+#' @param w weights
+#' @import matrixStats
+#' @import limma
+#' @return column-wise weighted means.  
+.getWeightedMedian <- function( mat, w=rep(1, nrow(mat)) ){
+  
+  if( is.vector(w) ){
+    w <- c(w)
+    res <- colWeightedMedians( mat, w )
+  } else {
+    res <- vapply( seq(ncol(mat)), function(j){
+      yj <- mat[,j]
+      wj <- w[,j]
+      indx <- which( is.finite(yj) & (!is.na(wj)) ) 
+      yj <- yj[indx]
+      wj <- wj[indx]
+      weighted.median( yj, wj, na.rm=TRUE )
+    }, FUN.VALUE = numeric(1) )
+  }
+  return(res)
+}
+
 
 #' Obtain robust means. .
 #' @param res result structure of \code{wrench}
@@ -164,9 +188,8 @@ getWeightedMean <- function( mat, w=rep(1, nrow(mat)) ){
 #' @param ... other parameters
 #' @import matrixStats
 #' @return a chosen summary statistic 
-estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
-  # require(matrixStats)
-
+.estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
+  
   if(estim.type=="s2.w.mean"){ #weights based on s2
     with(res$others, colWeightedMeans( radj, 1/s2 ))
   } else if( estim.type=="gs.mean" ){ #this performs well for real-life data
@@ -182,83 +205,26 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
     with(res$others,  colMedians(radj)/exp(mean(log(colMedians(radj))))
     )
   } else if( estim.type=="w.marg.median" ){
-    W <- getMargWeights( res, ... )
-    with(res$others, {
-      sapply( seq(ncol(radj)), function(j){
-        y <- radj[,j]
-        w <- W[,j]
-        y <- y[!is.na(w)]
-        w <- w[!is.na(w)]
-        weighted.median( y, w )
-      } )
-    })
+    W <- .getMargWeights( res, ... )
+    .getWeightedMedian( res$others$radj, W )
   } else if (estim.type=="w.marg.mean"){
-    W <- getMargWeights( res, ... )
-    with(res$others, {
-      sapply( seq(ncol(radj)), function(j){
-        y <- radj[,j]
-        w <- W[,j]
-        y <- y[!is.na(w)]
-        w <- w[!is.na(w)]
-        weighted.mean( y, w )
-      } )
-    })
+    W <- .getMargWeights( res, ... )
+    .getWeightedMean( res$others$radj, W )
   }else if( estim.type=="w.cond.median" ){
-    W <- getCondWeights( res )
-    with(res$others, {
-      sapply( seq(ncol(radj)), function(j){
-        y <- radj[,j]
-        w <- W[,j]
-        y <- y[!is.na(w)]
-        w <- w[!is.na(w)]
-        weighted.median( y, w )
-      } )
-    })
+    W <- .getCondWeights( res )
+    .getWeightedMedian( res$others$radj, W )
   } else if( estim.type=="w.cond.mean"){
-    W <- getCondWeights( res )
-    with(res$others, {
-      sapply( seq(ncol(radj)), function(j){
-        y <- radj[,j]
-        w <- W[,j]
-        y <- y[!is.na(w)]
-        w <- w[!is.na(w)]
-        weighted.mean( y, w )
-      } )
-    })
+    W <- .getCondWeights( res )
+    .getWeightedMean( res$others$radj, W )
   } else if( estim.type=="w.cond.log.median" ){
-    W <- getCondLogWeights( res )
-    with(res$others, {
-      sapply( seq(ncol(radj)), function(j){
-        y <- log(radj[,j])
-        y[!is.finite(y)] <- NA
-        w <- W[,j]
-        y <- y[!is.na(w)]
-        w <- w[!is.na(w)]
-        exp(weighted.median( y, w, na.rm=TRUE ))
-      } )
-    })
+    W <- .getCondLogWeights( res )
+    exp( .getWeightedMedian( res$others$radj, W ) )
   } else if( estim.type=="w.cond.log.mean"){
-    W <- getCondLogWeights( res )
-    with(res$others, {
-      sapply( seq(ncol(radj)), function(j){
-        y <- log(radj[,j])
-        y[!is.finite(y)] <- NA
-        w <- W[,j]
-        y <- y[!is.na(w)]
-        w <- w[!is.na(w)]
-        exp(weighted.mean( y, w, na.rm=TRUE ))
-      } )
-    })
+    W <- .getCondLogWeights( res )
+    exp( .getWeightedMean( res$others$radj, W ) )
   } else if( estim.type=="hurdle.w.mean"  ){
-    #hurdle weights applied to regularized ratios
-    W <- 1/(1-res$others$pi0) #hurdle weights
-    with(res$others, {
-      sapply( seq(ncol(r)), function(j){
-        y <- r[,j]
-        w <- W[,j]
-        weighted.mean( r[,j], W[,j])
-      } )
-    })
+    W <- 1/(1-res$others$pi0) 
+    .getWeightedMean( res$others$radj, W )
   }
 }
 
@@ -267,10 +233,11 @@ estimSummary <- function( res, estim.type="s2.w.mean", ...  ){
 #' @param mat count matrix; rows are features and columns are samples
 #' @param ref.est reference estimate method
 #' @param ... other parameters
+#' @return the reference to be used for normalization
 #' @import stats
 #' @import graphics
-getReference <- function( mat, ref.est="sw.means", ... ){
-  # require(matrixStats)
+.getReference <- function( mat, ref.est="sw.means", ... ){
+  
   tots <- colSums(mat)
   if(ref.est=="logistic"){
     qref <- 1-plogis(
@@ -289,7 +256,7 @@ getReference <- function( mat, ref.est="sw.means", ... ){
 
 #'@import stats
 #'@import graphics
-detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=FALSE){
+.detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=FALSE){
   logccf <- log(ccf)
   logtau <- log(tau)
   grp <- as.factor(grp)
@@ -399,8 +366,6 @@ detrend.ccf <- function(ccf, tau, grp, plt.detrends.all=FALSE){
 wrench <- function( mat, condition, etype="w.marg.mean",
                     ebcf=TRUE, z.adj=FALSE, phi.adj=TRUE, detrend=FALSE, ... ){
 
-  # require(matrixStats)
-
   #trim
   mat <- mat[rowSums(mat)>0,]
   nzcols <- colSums(mat)>0
@@ -410,10 +375,11 @@ wrench <- function( mat, condition, etype="w.marg.mean",
 
   #feature-wise parameters: hurdle, variance, reference and raw ratios
   n <- ncol(mat)
+  p <- nrow(mat)
   tots <- colSums(mat)
   compute.pi0 <- !((etype %in% c("mean", "median", "s2.w.mean")) & !z.adj )
   if(compute.pi0){
-    pi0 <- getHurdle( mat, ... )$pi0
+    pi0 <- .getHurdle( mat, ... )$pi0
   }
   group <- as.character(condition)
   if(length(unique(group)) == 1){
@@ -421,10 +387,10 @@ wrench <- function( mat, condition, etype="w.marg.mean",
   } else {
     design <- model.matrix(~-1+group)
   }
-  s2 <- gets2(mat,design,...)
+  s2 <- .gets2(mat,design,...)
 
   #refernece
-  qref <- getReference( mat, ... )
+  qref <- .getReference( mat, ... )
 
   #sample-wise ratios
   qmat <- sweep(mat, 2, colSums(mat), "/")
@@ -432,13 +398,15 @@ wrench <- function( mat, condition, etype="w.marg.mean",
 
   if(ebcf){
     #group-wise ratios
-    Yg <- sapply( unique(group), function(g){
-      if(sum(group==g)>1){
-        rowSums(mat[,group==g])
+    Yg <- vapply( unique(group), function(g){
+      g_indx <- which(group==g)
+      ng <- sum(group==g)
+      if(ng>1){
+        rowSums(mat[,g_indx])
       } else {
-        mat[,group==g]
+        mat[,g_indx]
       }
-    }  )
+    }, FUN.VALUE=numeric(p)  )
     qg <- sweep(Yg, 2, colSums(Yg), "/") #weighted estimator
     rg <- qg/qref
     lrg <- log(rg)
@@ -451,18 +419,17 @@ wrench <- function( mat, condition, etype="w.marg.mean",
 
     #regularized estimation of positive means.
     r <- sweep(r, 2, thetag_rep, "/")
-    thetagj <- exp( sapply(seq(n), function(j){
+    thetagj <- exp( vapply(seq(n), function(j){
       x <- log(r[,j])
       x[!is.finite(x)] <- NA
       weighted.mean( x, w=1/(s2+s2thetag_rep[j]), na.rm=TRUE )
-    }))
+    }, FUN.VALUE = numeric(1)))
 
-    p <- nrow(r)
-    thetagi <- t( sapply(seq(p), function(i){
+    thetagi <- t( vapply(seq(p), function(i){
       exp(
         (s2thetag_rep/(s2[i]+s2thetag_rep))*( log(r[i,]) - log(thetagj) )
       )
-    }) )
+    }, FUN.VALUE = numeric(n)) )
 
     r <- sweep( thetagi, 2, thetagj*thetag_rep, "*")
   }
@@ -501,17 +468,18 @@ wrench <- function( mat, condition, etype="w.marg.mean",
     res$others <- c(res$others, list("pi0"=pi0))
   }
 
-  res$ccf <- estimSummary( res, estim.type = etype, z.adj=z.adj, ... )
+  res$ccf <- .estimSummary( res, estim.type = etype, z.adj=z.adj, ... )
   res$ccf <- with(res, ccf/exp(mean(log(ccf))))
 
   if( detrend ){
     res$others$ccf0 <- res$ccf
-    detrended <- detrend.ccf( res$ccf, tots, condition )
+    detrended <- .detrend.ccf( res$ccf, tots, condition )
     res$others$ccf.detr.un <- detrended$ccf.detr.un
     res$ccf <- detrended$ccf.detr
   }
 
   tjs <- colSums(mat)/exp(mean(log(colSums(mat))))
+  names(res$ccf) <- names(tjs)
   res$nf <- res$ccf * tjs
 
 
