@@ -116,7 +116,7 @@ In cases of very low sample depths and high sparsity, one might find a roughly l
 
 If you find this happening with the Wrench reconstructed compositional factors, and if you can assume it is reasonable to do so, you can use the detrend=T option (a work in progress) in Wrench to remove such linear trends within groups. It is also worth mentioning that even though low sample-depth samples' compositional factors can show this behavior, in our experience, we have often found that group-wise averages of compositional factors can still be robust. 
 
-## Session Info
+# Session Info
 ```{r sessionInfo}
 sessionInfo()
 ```
